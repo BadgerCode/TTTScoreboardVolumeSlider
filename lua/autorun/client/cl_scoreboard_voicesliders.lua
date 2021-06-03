@@ -1,41 +1,57 @@
-hook.Remove("TTTScoreboardMenu", "TTTScoreboardMenuVoiceSliders")
-hook.Add("TTTScoreboardMenu","TTTScoreboardMenuVoiceSliders", function(menu)
-    print("Right click TTT row")
-end)
+local function RenderVoiceSlider(ply)
+    local width = 300
+    local height = 50
+    local padding = 10
 
+    local x = math.max(gui.MouseX() - width, 0)
+    local y = math.min(gui.MouseY(), ScrH() - height)
 
-local function RenderVoiceSlider(ply, x, y)
     local frame = vgui.Create( "DFrame" )
     frame:SetPos(x, y)
-    frame:SetSize( 300, 200 )
+    frame:SetSize(width, height)
     frame:MakePopup()
     frame:SetTitle("")
 	frame:ShowCloseButton(false)
 	frame:SetDraggable(false)
 	frame:SetSizable(false)
+    frame.Paint = function(self, w, h)
+        draw.RoundedBox(5, 0, 0, w, h, Color(24, 25, 28, 255))
+    end
+
+    -- TODO: Keep this timer?
+    timer.Simple(20, function()
+        if IsValid(frame) then
+            frame:Close()
+        end
+    end)
+
+    local currentValue = ply:GetVoiceVolumeScale()
+    currentValue = currentValue != nil and currentValue or 1
+
+
 
     local text = vgui.Create("DLabel", frame)
-    text:Dock( TOP )
-	text:DockMargin( 4, 0, 0, 0 ) -- shift to the right
-	text:SetColor( color_black )
+    text:SetPos(padding, padding)
+    text:SetSize(width - padding * 2, 20)
+	text:SetColor(Color(255, 255, 255, 255))
     text.UpdateValue = function(self, newValue)
         self:SetText(math.Round(newValue * 100) .. "%")
     end
-    text:UpdateValue(ply:GetVoiceVolumeScale())
+    text:UpdateValue(currentValue)
+    text:SetContentAlignment(5)
+
 
 
     local slider = vgui.Create( "DSlider", frame)
+	slider:SetHeight(16)
     slider:Dock(TOP)
+    slider:SetSlideX(currentValue)
 	slider:SetLockY(0.5)
-    slider:SetSlideX(ply:GetVoiceVolumeScale())
 	slider.TranslateValues = function(slider, x, y)
         ply:SetVoiceVolumeScale(x)
         text:UpdateValue(x)
         return x, y
     end
-	slider:SetTrapInside( true )
-	slider:Dock( FILL )
-	slider:SetHeight( 16 )
 
     local oldOnMouseReleased = slider.OnMouseReleased
     slider.OnMouseReleased = function(panel, mcode)
@@ -66,11 +82,12 @@ local function RenderVoiceSlider(ply, x, y)
     -- end
 end
 
+-- TODO: remove, or turn into a proper command with a player target
 concommand.Remove("test_volume_slider")
 concommand.Add("test_volume_slider", function( ply, cmd, args )
     print("Rendering volume slider")
 
-    RenderVoiceSlider(ply, 500, 500)
+    RenderVoiceSlider(ply)
 end)
 
 
@@ -79,8 +96,9 @@ print("Reloading volume slider")
 
 hook.Remove("TTTScoreboardColumns", "TTTScoreboardMenuVoiceSliders")
 hook.Add("TTTScoreboardColumns","TTTScoreboardMenuVoiceSliders", function(pnl)
-    print("Scoreboard initialised")
+    print("Scoreboard initialised") -- TODO: Remove
 
+    -- TODO: Remove
     /*
     self.voice = vgui.Create("DImageButton", self)
     self.voice:SetSize(16,16)
@@ -121,20 +139,20 @@ hook.Add("TTTScoreboardColumns","TTTScoreboardMenuVoiceSliders", function(pnl)
     -- Skip the header row
     if pnl.GetPlayer == nil then return end
 
+    -- This timer allows the scoreboard to add the mute button, which happens after this function runs
     timer.Simple(1, function()
         local rowPlayer = pnl:GetPlayer()
 
         if (rowPlayer == LocalPlayer()) then return end
-        print("Adding custom voice button for " .. rowPlayer:Nick())
-
+        print("Adding custom voice button for " .. rowPlayer:Nick()) -- TODO: Remove
 
         pnl.voice.DoRightClick = function()
-            print("Right clicked on custom voice for " .. rowPlayer:Nick())
+            print("Right clicked on custom voice for " .. rowPlayer:Nick()) -- TODO: Remove
 
-            local posX, posY = pnl.voice:GetPos()
-            RenderVoiceSlider(rowPlayer, posX, posY)
+            RenderVoiceSlider(rowPlayer)
         end
 
+        -- TODO: Remove
         -- for _, v in ipairs( pnl:GetChildren() ) do
         --     print( v:GetClassName() )
         -- end
