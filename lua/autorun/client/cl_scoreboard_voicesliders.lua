@@ -3,9 +3,17 @@ local function RenderVoiceSlider(ply)
     local height = 50
     local padding = 10
 
+    local sliderHeight = 16
+    local sliderDisplayHeight = 8
+
     local x = math.max(gui.MouseX() - width, 0)
     local y = math.min(gui.MouseY(), ScrH() - height)
 
+    local currentPlayerVolume = ply:GetVoiceVolumeScale()
+    currentPlayerVolume = currentPlayerVolume != nil and currentPlayerVolume or 1
+
+
+    -- Frame for the slider
     local frame = vgui.Create( "DFrame" )
     frame:SetPos(x, y)
     frame:SetSize(width, height)
@@ -18,17 +26,11 @@ local function RenderVoiceSlider(ply)
         draw.RoundedBox(5, 0, 0, w, h, Color(24, 25, 28, 255))
     end
 
-    -- TODO: Keep this timer?
-    timer.Simple(10, function()
-        if IsValid(frame) then
-            frame:Close()
-        end
-    end)
-
-    local currentValue = ply:GetVoiceVolumeScale()
-    currentValue = currentValue != nil and currentValue or 1
+    -- Automatically close after 10 seconds (something may have gone wrong)
+    timer.Simple(10, function() if IsValid(frame) then frame:Close() end end)
 
 
+    -- "Player volume"
     local label = vgui.Create("DLabel", frame)
     label:SetPos(padding, padding)
     label:SetFont("cool_small")
@@ -37,14 +39,12 @@ local function RenderVoiceSlider(ply)
     label:SetText("Player Volume")
 
 
-    local sliderHeight = 16
-    local sliderDisplayHeight = 8
-
-    local slider = vgui.Create( "DSlider", frame)
+    -- Slider
+    local slider = vgui.Create("DSlider", frame)
 	slider:SetHeight(sliderHeight)
     slider:Dock(TOP)
     slider:DockMargin(padding, 0, padding, 0)
-    slider:SetSlideX(currentValue)
+    slider:SetSlideX(currentPlayerVolume)
 	slider:SetLockY(0.5)
 	slider.TranslateValues = function(slider, x, y)
         ply:SetVoiceVolumeScale(x)
