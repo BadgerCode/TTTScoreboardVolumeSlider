@@ -51,20 +51,18 @@ local function RenderVoiceSlider(ply)
         return x, y
     end
 
-    local oldOnMouseReleased = slider.OnMouseReleased
-    slider.OnMouseReleased = function(panel, mcode)
-		frame:Close()
-	end
+    -- Close the slider panel once the player has selected a volume
+    slider.OnMouseReleased = function(panel, mcode) frame:Close() end
+	slider.Knob.OnMouseReleased = function(panel, mcode) frame:Close() end
 
-    local oldKnobOnMouseReleased = slider.Knob.OnMouseReleased
-	slider.Knob.OnMouseReleased = function(panel, mcode)
-		frame:Close()
-	end
 
+    -- Slider rendering
+    -- Render slider bar
     slider.Paint = function(self, w, h)
         draw.RoundedBox(5, 0, sliderDisplayHeight / 2, w, sliderDisplayHeight, Color(200, 46, 46, 255))
     end
 
+    -- Render slider "knob" & text
     slider.Knob.Paint = function(self, w, h)
         if(slider:IsEditing()) then
             local textValue = math.Round(slider:GetSlideX() * 100) .. "%"
@@ -86,21 +84,9 @@ local function RenderVoiceSlider(ply)
     end
 end
 
--- TODO: remove, or turn into a proper command with a player target
-concommand.Remove("test_volume_slider")
-concommand.Add("test_volume_slider", function( ply, cmd, args )
-    print("Rendering volume slider")
-
-    RenderVoiceSlider(ply)
-end)
-
-
-
-print("Reloading volume slider") -- TODO: Delete
 
 hook.Remove("TTTScoreboardColumns", "TTTScoreboardMenuVoiceSliders")
 hook.Add("TTTScoreboardColumns","TTTScoreboardMenuVoiceSliders", function(pnl)
-    
     -- Skip the header row
     if pnl.GetPlayer == nil then return end
 
@@ -111,7 +97,11 @@ hook.Add("TTTScoreboardColumns","TTTScoreboardMenuVoiceSliders", function(pnl)
             local rowPlayer = pnl:GetPlayer()
             if (rowPlayer == LocalPlayer() or not IsValid(rowPlayer)) then return end
 
+            -- This addon may be used before the update which adds GetVoiceVolumeScale/SetVoiceVolumeScale
+            if rowPlayer.GetVoiceVolumeScale == nil or rowPlayer.SetVoiceVolumeScale == nil then return end
+
             RenderVoiceSlider(rowPlayer)
         end
     end)
 end)
+
