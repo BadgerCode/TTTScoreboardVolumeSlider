@@ -1,4 +1,9 @@
-local function RenderVoiceSlider(ply)
+hook.Remove("Initialize", "TTTScoreboardMenuVoiceSliders")
+hook.Add("Initialize", "TTTScoreboardMenuVoiceSliders", function()
+    LANG.AddToLanguage("english", "sb_playervolume", "Player Volume")
+end)
+
+local function RenderVoiceSlider(targetPlayer)
     local width = 300
     local height = 50
     local padding = 10
@@ -9,7 +14,7 @@ local function RenderVoiceSlider(ply)
     local x = math.max(gui.MouseX() - width, 0)
     local y = math.min(gui.MouseY(), ScrH() - height)
 
-    local currentPlayerVolume = ply:GetVoiceVolumeScale()
+    local currentPlayerVolume = targetPlayer:GetVoiceVolumeScale()
     currentPlayerVolume = currentPlayerVolume != nil and currentPlayerVolume or 1
 
 
@@ -36,7 +41,7 @@ local function RenderVoiceSlider(ply)
     label:SetFont("cool_small")
     label:SetSize(width - padding * 2, 20)
 	label:SetColor(Color(255, 255, 255, 255))
-    label:SetText("Player Volume")
+    label:SetText(LANG.GetTranslation("sb_playervolume"))
 
 
     -- Slider
@@ -47,7 +52,7 @@ local function RenderVoiceSlider(ply)
     slider:SetSlideX(currentPlayerVolume)
 	slider:SetLockY(0.5)
 	slider.TranslateValues = function(slider, x, y)
-        ply:SetVoiceVolumeScale(x)
+        targetPlayer:SetVoiceVolumeScale(x)
         return x, y
     end
 
