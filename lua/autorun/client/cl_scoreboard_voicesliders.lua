@@ -64,7 +64,13 @@ local function RenderVoiceSlider(targetPlayer)
     -- Slider rendering
     -- Render slider bar
     slider.Paint = function(self, w, h)
-        draw.RoundedBox(5, 0, sliderDisplayHeight / 2, w, sliderDisplayHeight, Color(200, 46, 46, 255))
+        local volumePercent = slider:GetSlideX()
+
+        -- Filled in box
+        draw.RoundedBox(5, 0, sliderDisplayHeight / 2, w * volumePercent, sliderDisplayHeight, Color(200, 46, 46, 255))
+
+        -- Grey box
+        draw.RoundedBox(5, w * volumePercent, sliderDisplayHeight / 2, w * (1 - volumePercent), sliderDisplayHeight, Color(79, 84, 92, 255))
     end
 
     -- Render slider "knob" & text
