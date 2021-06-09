@@ -104,6 +104,8 @@ hook.Add("TTTScoreboardColumns","TTTScoreboardMenuVoiceSliders", function(pnl)
     -- Wait for the scoreboard to finish adding the mute (voice) button, before trying to modify it
     -- We have to wait for the panel's player to be set too
     timer.Simple(2, function()
+        if pnl.voice == nil then return end
+
         pnl.voice.DoRightClick = function()
             local rowPlayer = pnl:GetPlayer()
             if (rowPlayer == LocalPlayer() or not IsValid(rowPlayer)) then return end
