@@ -34,6 +34,12 @@ local function RenderVoiceSlider(targetPlayer)
     -- Automatically close after 10 seconds (something may have gone wrong)
     timer.Simple(10, function() if IsValid(frame) then frame:Close() end end)
 
+    hook.Add( "Think", "VoiceSlider_CheckInput", function()
+    	if not input.IsKeyDown( KEY_TAB ) then
+		hook.Remove( "Think", "VoiceSlider_CheckInput" )
+		frame:Close()
+	end
+    end )
 
     -- "Player volume"
     local label = vgui.Create("DLabel", frame)
