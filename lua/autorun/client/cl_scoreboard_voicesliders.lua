@@ -37,7 +37,7 @@ local function RenderVoiceSlider(targetPlayer)
     hook.Add( "Think", "VoiceSlider_CheckInput", function()
     	if not input.IsKeyDown( KEY_TAB ) then
 		hook.Remove( "Think", "VoiceSlider_CheckInput" )
-		frame:Close()
+		if IsValid(frame) then frame:Close() end
 	end
     end )
 
