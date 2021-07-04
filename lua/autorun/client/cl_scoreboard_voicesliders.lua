@@ -1,6 +1,7 @@
 hook.Remove("Initialize", "TTTScoreboardMenuVoiceSliders")
 hook.Add("Initialize", "TTTScoreboardMenuVoiceSliders", function()
     LANG.AddToLanguage("english", "sb_playervolume", "Player Volume")
+    LANG.AddToLanguage("Português (Brasil)", "sb_playervolume", "Volume do jogador")
 end)
 
 local function RenderVoiceSlider(targetPlayer)
